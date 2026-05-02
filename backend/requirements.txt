@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+python-multipart
+python-pptx
+pypdfium2
+httpx
+Pillow
+sqlalchemy
+bcrypt==3.2.2
+passlib[bcrypt]
+python-jose[cryptography]
