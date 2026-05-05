@@ -27,18 +27,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
-  const [createType, setCreateType] = useState<'task' | 'reminder' | 'subject'>('task');
-  const { theme } = useAppStore();
+  const { theme, isCreateModalOpen, createModalType, closeCreateModal, openCreateModal } = useAppStore();
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', theme === 'dark');
   }, [theme]);
-
-  const openCreateModal = (type: 'task' | 'reminder' | 'subject') => {
-    setCreateType(type);
-    setIsCreateModalOpen(true);
-  };
 
   return (
     <AuthProvider>
@@ -74,13 +67,13 @@ export default function App() {
                   </div>
 
                   {/* Floating Action Button */}
-                  <FloatingActionButton onAction={openCreateModal} />
+                  <FloatingActionButton onAction={(type) => openCreateModal(type)} />
 
                   {/* Create Modal */}
                   <CreateModal
                     isOpen={isCreateModalOpen}
-                    onClose={() => setIsCreateModalOpen(false)}
-                    type={createType}
+                    onClose={closeCreateModal}
+                    type={createModalType}
                   />
                 </div>
               </ProtectedRoute>

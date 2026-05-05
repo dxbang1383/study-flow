@@ -9,7 +9,7 @@ interface SubjectDrawerProps {
 
 export default function SubjectDrawer({ subjectId, onClose }: SubjectDrawerProps) {
   const navigate = useNavigate();
-  const { subjects, tasks, reminders, updateTask, startTimer } = useAppStore();
+  const { subjects, tasks, reminders, updateTask, startTimer, openCreateModal } = useAppStore();
 
   if (!subjectId) return null;
 
@@ -30,12 +30,19 @@ export default function SubjectDrawer({ subjectId, onClose }: SubjectDrawerProps
     } as const;
 
     const newStatus = statusMap[task.status];
-    updateTask(taskId, { status: newStatus });
-
+    
     if (newStatus === 'in-progress') {
-      startTimer('study', task.subjectId);
-      navigate('/timer');
-      onClose();
+      const confirmStart = window.confirm("Do you want to start the timer?");
+      if (confirmStart) {
+        updateTask(taskId, { status: newStatus });
+        startTimer('study', task.subjectId);
+        navigate('/timer');
+        onClose();
+      } else {
+        updateTask(taskId, { status: newStatus });
+      }
+    } else {
+      updateTask(taskId, { status: newStatus });
     }
   };
 
@@ -76,7 +83,10 @@ export default function SubjectDrawer({ subjectId, onClose }: SubjectDrawerProps
                 <h3 className="font-medium text-gray-900 dark:text-gray-100">Tasks</h3>
                 <span className="text-sm text-gray-500 dark:text-gray-400">({subjectTasks.length})</span>
               </div>
-              <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors">
+              <button 
+                onClick={() => openCreateModal('task', subjectId)}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
+              >
                 <Plus className="w-4 h-4 text-gray-600 dark:text-gray-400" />
               </button>
             </div>
@@ -133,7 +143,10 @@ export default function SubjectDrawer({ subjectId, onClose }: SubjectDrawerProps
                 <h3 className="font-medium text-gray-900 dark:text-gray-100">Reminders</h3>
                 <span className="text-sm text-gray-500 dark:text-gray-400">({subjectReminders.length})</span>
               </div>
-              <button className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors">
+              <button 
+                onClick={() => openCreateModal('reminder', subjectId)}
+                className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded transition-colors"
+              >
                 <Plus className="w-4 h-4 text-gray-600 dark:text-gray-400" />
               </button>
             </div>

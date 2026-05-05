@@ -33,7 +33,7 @@ export default function Dashboard() {
           {/* Header */}
           <div>
             <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Dashboard</h1>
-            <p className="text-gray-600 dark:text-gray-400">Welcome back! Here's your study overview for today.</p>
+            <p className="text-gray-600 dark:text-gray-400">Welcome! Here's your study overview for today.</p>
           </div>
 
           {/* Overdue Tasks Section */}

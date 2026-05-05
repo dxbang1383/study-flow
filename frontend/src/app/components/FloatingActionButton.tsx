@@ -6,7 +6,7 @@ interface FloatingActionButtonProps {
 }
 
 export default function FloatingActionButton({ onAction }: FloatingActionButtonProps) {
-  const [position, setPosition] = useState({ x: window.innerWidth - 120, y: window.innerHeight - 120 });
+  const [position, setPosition] = useState<{ x: number | null; y: number | null }>({ x: null, y: null });
   const [isDragging, setIsDragging] = useState(false);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const fabRef = useRef<HTMLDivElement>(null);
@@ -38,11 +38,46 @@ export default function FloatingActionButton({ onAction }: FloatingActionButtonP
     if ((e.target as HTMLElement).closest('button.action-btn')) return;
 
     setIsDragging(true);
+    let currentX = position.x;
+    let currentY = position.y;
+
+    if (currentX === null || currentY === null) {
+      if (fabRef.current) {
+        const rect = fabRef.current.getBoundingClientRect();
+        currentX = rect.left;
+        currentY = rect.top;
+        setPosition({ x: currentX, y: currentY });
+      } else {
+        currentX = window.innerWidth - 80;
+        currentY = window.innerHeight - 80;
+      }
+    }
+
     dragOffsetRef.current = {
-      x: e.clientX - position.x,
-      y: e.clientY - position.y,
+      x: e.clientX - currentX,
+      y: e.clientY - currentY,
     };
   };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setPosition((prev) => {
+        if (prev.x === null || prev.y === null) return prev;
+        
+        const maxX = window.innerWidth - 80;
+        const maxY = window.innerHeight - 80;
+        return {
+          x: Math.max(20, Math.min(prev.x, maxX)),
+          y: Math.max(20, Math.min(prev.y, maxY)),
+        };
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    handleResize(); // Initial check
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (isDragging) {
@@ -61,8 +96,10 @@ export default function FloatingActionButton({ onAction }: FloatingActionButtonP
       ref={fabRef}
       className="fixed flex flex-col-reverse items-end gap-3 group z-50"
       style={{
-        left: `${position.x}px`,
-        top: `${position.y}px`,
+        left: position.x !== null ? `${position.x}px` : 'auto',
+        top: position.y !== null ? `${position.y}px` : 'auto',
+        right: position.x === null ? '32px' : 'auto',
+        bottom: position.y === null ? '32px' : 'auto',
         cursor: isDragging ? 'grabbing' : 'grab',
       }}
       onMouseDown={handleMouseDown}

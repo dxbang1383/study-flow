@@ -65,6 +65,12 @@ interface AppState {
   startTimer: (type: 'study' | 'play', subjectId?: string) => void;
   stopTimer: () => void;
   switchTimerMode: (type: 'study' | 'play', subjectId?: string) => void;
+
+  isCreateModalOpen: boolean;
+  createModalType: 'task' | 'reminder' | 'subject';
+  createModalSubjectId: string | null;
+  openCreateModal: (type: 'task' | 'reminder' | 'subject', subjectId?: string) => void;
+  closeCreateModal: () => void;
 }
 
 // Initial mock data
@@ -166,6 +172,9 @@ export const useAppStore = create<AppState>()(
       theme: 'light',
       timerSessions: [],
       activeTimer: null,
+      isCreateModalOpen: false,
+      createModalType: 'task',
+      createModalSubjectId: null,
 
       addSubject: (subject) =>
         set((state) => ({ subjects: [...state.subjects, subject] })),
@@ -260,6 +269,9 @@ export const useAppStore = create<AppState>()(
               (state.activeTimer.type === 'study' ? Math.round(duration / 1000 / 60 / 60) : 0),
           };
         }),
+
+      openCreateModal: (type, subjectId) => set({ isCreateModalOpen: true, createModalType: type, createModalSubjectId: subjectId || null }),
+      closeCreateModal: () => set({ isCreateModalOpen: false, createModalSubjectId: null }),
     }),
     {
       name: 'study-app-storage',

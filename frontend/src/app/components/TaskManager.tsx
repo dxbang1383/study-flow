@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Filter, ArrowUpDown } from 'lucide-react';
+import { Trash2, Filter, ArrowUpDown, Search } from 'lucide-react';
 import { useAppStore } from './store';
 
 type SortField = 'name' | 'subject' | 'deadline' | 'status';
@@ -13,6 +13,7 @@ export default function TaskManager() {
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [filterStatus, setFilterStatus] = useState<string>('all');
   const [filterSubject, setFilterSubject] = useState<string>('all');
+  const [filterTag, setFilterTag] = useState<string>('');
 
   const getSubject = (subjectId: string) => {
     return subjects.find((s) => s.id === subjectId);
@@ -41,6 +42,13 @@ export default function TaskManager() {
 
     if (filterSubject !== 'all') {
       filtered = filtered.filter((task) => task.subjectId === filterSubject);
+    }
+
+    if (filterTag.trim() !== '') {
+      const searchTag = filterTag.toLowerCase().trim();
+      filtered = filtered.filter((task) => 
+        task.tags && task.tags.some(tag => tag.toLowerCase().includes(searchTag))
+      );
     }
 
     filtered.sort((a, b) => {
@@ -73,7 +81,7 @@ export default function TaskManager() {
     });
 
     return filtered;
-  }, [tasks, subjects, sortField, sortOrder, filterStatus, filterSubject]);
+  }, [tasks, subjects, sortField, sortOrder, filterStatus, filterSubject, filterTag]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -126,6 +134,17 @@ export default function TaskManager() {
                 </option>
               ))}
             </select>
+
+            <div className="relative max-w-xs ml-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by tag..."
+                value={filterTag}
+                onChange={(e) => setFilterTag(e.target.value)}
+                className="w-full pl-9 pr-4 py-2 bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-900 dark:text-gray-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+            </div>
 
             <div className="flex-1" />
 
@@ -241,6 +260,14 @@ export default function TaskManager() {
                             onChange={(e) => {
                               const newStatus = e.target.value as 'todo' | 'in-progress' | 'done';
                               updateTask(task.id, { status: newStatus });
+                              
+                              if (newStatus === 'in-progress') {
+                                const confirmStart = window.confirm("Do you want to start the timer?");
+                                if (confirmStart) {
+                                  startTimer('study', task.subjectId);
+                                  navigate('/timer');
+                                }
+                              }
                             }}
                             className={`px-3 py-1 rounded-full text-sm font-medium border-0 focus:outline-none focus:ring-2 focus:ring-blue-400 ${
                               task.status === 'done'

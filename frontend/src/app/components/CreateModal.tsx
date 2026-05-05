@@ -9,10 +9,10 @@ interface CreateModalProps {
 }
 
 export default function CreateModal({ isOpen, onClose, type }: CreateModalProps) {
-  const { subjects, addSubject, addTask, addReminder } = useAppStore();
+  const { subjects, addSubject, addTask, addReminder, createModalSubjectId } = useAppStore();
   const [formData, setFormData] = useState({
     name: '',
-    subjectId: '',
+    subjectId: createModalSubjectId || '',
     deadline: '',
     description: '',
     color: '#93C5FD',
@@ -29,8 +29,13 @@ export default function CreateModal({ isOpen, onClose, type }: CreateModalProps)
         color: '#93C5FD',
         tags: '',
       });
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        subjectId: createModalSubjectId || '',
+      }));
     }
-  }, [isOpen]);
+  }, [isOpen, createModalSubjectId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
