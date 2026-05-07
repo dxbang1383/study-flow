@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Trash2, Filter, ArrowUpDown, Search } from 'lucide-react';
+import { Trash2, Filter, ArrowUpDown, Search, Edit2 } from 'lucide-react';
 import { useAppStore } from './store';
 
 type SortField = 'name' | 'subject' | 'deadline' | 'status';
@@ -8,7 +8,7 @@ type SortOrder = 'asc' | 'desc';
 
 export default function TaskManager() {
   const navigate = useNavigate();
-  const { tasks, subjects, deleteTask, updateTask, startTimer } = useAppStore();
+  const { tasks, subjects, deleteTask, updateTask, startTimer, openEditModal } = useAppStore();
   const [sortField, setSortField] = useState<SortField>('deadline');
   const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
   const [filterStatus, setFilterStatus] = useState<string>('all');
@@ -283,12 +283,26 @@ export default function TaskManager() {
                           </select>
                         </td>
                         <td className="px-6 py-4 text-center">
-                          <button
-                            onClick={() => deleteTask(task.id)}
-                            className="p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
+                          <div className="flex items-center justify-center gap-1">
+                            <button
+                              onClick={() => openEditModal('task', task.id)}
+                              className="p-2 text-blue-500 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
+                              title="Edit task"
+                            >
+                              <Edit2 className="w-4 h-4" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (window.confirm("Are you sure you want to delete this task?")) {
+                                  deleteTask(task.id);
+                                }
+                              }}
+                              className="p-2 text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                              title="Delete task"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );

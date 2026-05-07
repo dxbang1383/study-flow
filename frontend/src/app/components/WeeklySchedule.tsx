@@ -2,7 +2,7 @@ import { useDrop } from 'react-dnd';
 import { useAppStore } from './store';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const timeSlots = ['Morning (8-12)', 'Afternoon (12-16)', 'Evening (16-20)', 'Night (20-24)'];
+const timeSlots = ['Shift 1 (1 - 3)', 'Shift 2 (4 - 6)', 'Shift 3 (7 - 9)', 'Shift 4 (10 - 12)'];
 
 export default function WeeklySchedule() {
   const { schedule, subjects, setScheduleSlot } = useAppStore();
@@ -13,7 +13,7 @@ export default function WeeklySchedule() {
 
   const getSubject = (subjectId: string | null) => {
     if (!subjectId) return null;
-    return subjects.find((s) => s.id === subjectId);
+    return subjects.find((s) => s.id === subjectId) || null;
   };
 
   return (
@@ -79,10 +79,9 @@ function ScheduleCell({ day, timeSlot, subject, onDrop }: ScheduleCellProps) {
 
   return (
     <td
-      ref={drop}
-      className={`px-4 py-6 text-center transition-all ${
-        isOver ? 'bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-400 ring-inset' : 'hover:bg-gray-50 dark:hover:bg-gray-800'
-      }`}
+      ref={drop as any}
+      className={`px-4 py-6 text-center transition-all ${isOver ? 'bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-400 ring-inset' : 'hover:bg-gray-50 dark:hover:bg-gray-800'
+        }`}
     >
       {subject ? (
         <div className="relative group">

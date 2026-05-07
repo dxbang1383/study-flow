@@ -9,7 +9,7 @@ interface CreateModalProps {
 }
 
 export default function CreateModal({ isOpen, onClose, type }: CreateModalProps) {
-  const { subjects, addSubject, addTask, addReminder, createModalSubjectId } = useAppStore();
+  const { subjects, tasks, reminders, addSubject, addTask, addReminder, updateTask, updateReminder, createModalSubjectId, editItemId } = useAppStore();
   const [formData, setFormData] = useState({
     name: '',
     subjectId: createModalSubjectId || '',
@@ -29,13 +29,39 @@ export default function CreateModal({ isOpen, onClose, type }: CreateModalProps)
         color: '#93C5FD',
         tags: '',
       });
+    } else if (editItemId) {
+      if (type === 'task') {
+        const task = tasks.find(t => t.id === editItemId);
+        if (task) {
+          setFormData({
+            name: task.name,
+            subjectId: task.subjectId,
+            deadline: task.deadline,
+            description: task.description || '',
+            color: '#93C5FD',
+            tags: task.tags?.join(', ') || '',
+          });
+        }
+      } else if (type === 'reminder') {
+        const reminder = reminders.find(r => r.id === editItemId);
+        if (reminder) {
+          setFormData({
+            name: reminder.name,
+            subjectId: reminder.subjectId,
+            deadline: reminder.dueDate,
+            description: reminder.description || '',
+            color: '#93C5FD',
+            tags: '',
+          });
+        }
+      }
     } else {
       setFormData(prev => ({
         ...prev,
         subjectId: createModalSubjectId || '',
       }));
     }
-  }, [isOpen, createModalSubjectId]);
+  }, [isOpen, createModalSubjectId, editItemId, type, tasks, reminders]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,23 +77,42 @@ export default function CreateModal({ isOpen, onClose, type }: CreateModalProps)
         ? formData.tags.split(',').map((tag) => tag.trim()).filter((tag) => tag)
         : [];
 
-      addTask({
-        id: Date.now().toString(),
-        name: formData.name,
-        subjectId: formData.subjectId,
-        deadline: formData.deadline,
-        status: 'todo',
-        description: formData.description,
-        tags,
-      });
+      if (editItemId) {
+        updateTask(editItemId, {
+          name: formData.name,
+          subjectId: formData.subjectId,
+          deadline: formData.deadline,
+          description: formData.description,
+          tags,
+        });
+      } else {
+        addTask({
+          id: Date.now().toString(),
+          name: formData.name,
+          subjectId: formData.subjectId,
+          deadline: formData.deadline,
+          status: 'todo',
+          description: formData.description,
+          tags,
+        });
+      }
     } else if (type === 'reminder') {
-      addReminder({
-        id: Date.now().toString(),
-        name: formData.name,
-        subjectId: formData.subjectId,
-        dueDate: formData.deadline,
-        description: formData.description,
-      });
+      if (editItemId) {
+        updateReminder(editItemId, {
+          name: formData.name,
+          subjectId: formData.subjectId,
+          dueDate: formData.deadline,
+          description: formData.description,
+        });
+      } else {
+        addReminder({
+          id: Date.now().toString(),
+          name: formData.name,
+          subjectId: formData.subjectId,
+          dueDate: formData.deadline,
+          description: formData.description,
+        });
+      }
     }
 
     onClose();
@@ -81,7 +126,7 @@ export default function CreateModal({ isOpen, onClose, type }: CreateModalProps)
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
-            Create {type.charAt(0).toUpperCase() + type.slice(1)}
+            {editItemId ? 'Edit' : 'Create'} {type.charAt(0).toUpperCase() + type.slice(1)}
           </h2>
           <button
             onClick={onClose}
@@ -216,7 +261,7 @@ export default function CreateModal({ isOpen, onClose, type }: CreateModalProps)
               type="submit"
               className="flex-1 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:shadow-lg transition-all"
             >
-              Create
+              {editItemId ? 'Save Changes' : 'Create'}
             </button>
           </div>
         </form>

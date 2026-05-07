@@ -69,8 +69,12 @@ interface AppState {
   isCreateModalOpen: boolean;
   createModalType: 'task' | 'reminder' | 'subject';
   createModalSubjectId: string | null;
+  editItemId: string | null;
   openCreateModal: (type: 'task' | 'reminder' | 'subject', subjectId?: string) => void;
+  openEditModal: (type: 'task' | 'reminder' | 'subject', id: string) => void;
   closeCreateModal: () => void;
+  updateReminder: (id: string, updates: Partial<Reminder>) => void;
+  deleteReminder: (id: string) => void;
 }
 
 // Initial mock data
@@ -143,7 +147,7 @@ const initialReminders: Reminder[] = [
 ];
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-const timeSlots = ['Morning (8-12)', 'Afternoon (12-16)', 'Evening (16-20)', 'Night (20-24)'];
+const timeSlots = ['Shift 1 (1 - 3)', 'Shift 2 (4 - 6)', 'Shift 3 (7 - 9)', 'Shift 4 (10 - 12)'];
 
 const initialSchedule: ScheduleSlot[] = [];
 days.forEach((day) => {
@@ -153,12 +157,12 @@ days.forEach((day) => {
 });
 
 // Add some sample schedule items
-initialSchedule.find((s) => s.day === 'Monday' && s.timeSlot === 'Morning (8-12)')!.subjectId = '1';
-initialSchedule.find((s) => s.day === 'Monday' && s.timeSlot === 'Afternoon (12-16)')!.subjectId = '3';
-initialSchedule.find((s) => s.day === 'Tuesday' && s.timeSlot === 'Morning (8-12)')!.subjectId = '2';
-initialSchedule.find((s) => s.day === 'Wednesday' && s.timeSlot === 'Evening (16-20)')!.subjectId = '5';
-initialSchedule.find((s) => s.day === 'Thursday' && s.timeSlot === 'Morning (8-12)')!.subjectId = '4';
-initialSchedule.find((s) => s.day === 'Friday' && s.timeSlot === 'Afternoon (12-16)')!.subjectId = '1';
+initialSchedule.find((s) => s.day === 'Monday' && s.timeSlot === 'Shift 1 (1 - 3)')!.subjectId = '1';
+initialSchedule.find((s) => s.day === 'Monday' && s.timeSlot === 'Shift 2 (4 - 6)')!.subjectId = '3';
+initialSchedule.find((s) => s.day === 'Tuesday' && s.timeSlot === 'Shift 1 (1 - 3)')!.subjectId = '2';
+initialSchedule.find((s) => s.day === 'Wednesday' && s.timeSlot === 'Shift 3 (7 - 9)')!.subjectId = '5';
+initialSchedule.find((s) => s.day === 'Thursday' && s.timeSlot === 'Shift 1 (1 - 3)')!.subjectId = '4';
+initialSchedule.find((s) => s.day === 'Friday' && s.timeSlot === 'Shift 2 (4 - 6)')!.subjectId = '1';
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -175,6 +179,7 @@ export const useAppStore = create<AppState>()(
       isCreateModalOpen: false,
       createModalType: 'task',
       createModalSubjectId: null,
+      editItemId: null,
 
       addSubject: (subject) =>
         set((state) => ({ subjects: [...state.subjects, subject] })),
@@ -194,6 +199,16 @@ export const useAppStore = create<AppState>()(
 
       deleteTask: (id) =>
         set((state) => ({ tasks: state.tasks.filter((task) => task.id !== id) })),
+
+      updateReminder: (id, updates) =>
+        set((state) => ({
+          reminders: state.reminders.map((reminder) =>
+            reminder.id === id ? { ...reminder, ...updates } : reminder
+          ),
+        })),
+
+      deleteReminder: (id) =>
+        set((state) => ({ reminders: state.reminders.filter((reminder) => reminder.id !== id) })),
 
       setScheduleSlot: (day, timeSlot, subjectId) =>
         set((state) => ({
@@ -270,8 +285,9 @@ export const useAppStore = create<AppState>()(
           };
         }),
 
-      openCreateModal: (type, subjectId) => set({ isCreateModalOpen: true, createModalType: type, createModalSubjectId: subjectId || null }),
-      closeCreateModal: () => set({ isCreateModalOpen: false, createModalSubjectId: null }),
+      openCreateModal: (type, subjectId) => set({ isCreateModalOpen: true, createModalType: type, createModalSubjectId: subjectId || null, editItemId: null }),
+      openEditModal: (type, id) => set({ isCreateModalOpen: true, createModalType: type, editItemId: id, createModalSubjectId: null }),
+      closeCreateModal: () => set({ isCreateModalOpen: false, createModalSubjectId: null, editItemId: null }),
     }),
     {
       name: 'study-app-storage',

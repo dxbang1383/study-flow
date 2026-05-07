@@ -1,22 +1,26 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
-import { Bell, Search, Flame, Moon, Sun } from 'lucide-react';
+import { Bell, Search, Flame, Moon, Sun, Edit2, Trash2 } from 'lucide-react';
 import { useAppStore } from './store';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
 export default function TopNav() {
-  const { studyStreak, theme, toggleTheme, tasks, subjects, reminders, openCreateModal } = useAppStore();
-  const { user } = useAuth();
+  const { theme, toggleTheme, tasks, subjects, reminders, openCreateModal, openEditModal, deleteReminder } = useAppStore();
+  const { user, token, updateUser } = useAuth();
   const navigate = useNavigate();
   const [isNotifOpen, setIsNotifOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsSearchOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(event.target as Node)) {
+        setIsNotifOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -73,14 +77,63 @@ export default function TopNav() {
   const displayRole = user?.role || 'User';
   const initial = displayUser.charAt(0).toUpperCase();
 
-  const overdueTasks = tasks.filter((t) => {
-    if (t.status === 'done') return false;
-    const deadline = new Date(t.deadline);
-    const today = new Date();
-    deadline.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
-    return deadline <= today;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const allReminders = reminders.map(r => ({ id: r.id, name: r.name, date: r.dueDate, subjectId: r.subjectId, type: 'reminder' as const }));
+
+  const allNotifications = [...allReminders].sort((a, b) => {
+    // Sắp xếp theo ngày tăng dần (cũ nhất/quá hạn lâu nhất lên đầu, tương lai xa nhất ở cuối)
+    return new Date(a.date).getTime() - new Date(b.date).getTime();
   });
+
+  const getReminderColor = (dateString: string) => {
+    const dueDate = new Date(dateString);
+    dueDate.setHours(0, 0, 0, 0);
+    const timeDiff = dueDate.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+
+    if (daysDiff < 0) {
+      return "text-red-600 dark:text-red-400"; // Overdue
+    } else if (daysDiff <= 2) {
+      return "text-yellow-600 dark:text-yellow-500"; // <= 2 days
+    } else {
+      return "text-gray-900 dark:text-gray-100"; // Normal
+    }
+  };
+
+  const todayDate = new Date().toISOString().split('T')[0];
+  const canClickFlame = user && user.last_streak_date !== todayDate;
+  const displayStreak = user?.streak || 0;
+
+  const hasOverdueReminders = allNotifications.some(notif => {
+    const dueDate = new Date(notif.date);
+    dueDate.setHours(0, 0, 0, 0);
+    return dueDate.getTime() < today.getTime();
+  });
+
+  const handleFlameClick = async () => {
+    if (!canClickFlame || !user) return;
+    try {
+      const response = await fetch('http://localhost:8000/users/me', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          streak: displayStreak + 1,
+          last_streak_date: todayDate
+        })
+      });
+      if (response.ok) {
+        const updatedUser = await response.json();
+        updateUser(updatedUser);
+      }
+    } catch (err) {
+      console.error("Failed to update streak", err);
+    }
+  };
 
   return (
     <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between px-6 transition-colors">
@@ -145,32 +198,74 @@ export default function TopNav() {
         </button>
 
         {/* Notifications */}
-        <div className="relative">
+        <div className="relative" ref={notifRef}>
           <button 
             onClick={() => setIsNotifOpen(!isNotifOpen)}
             className="relative p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
           >
             <Bell className="w-5 h-5 text-gray-600 dark:text-gray-400" />
-            {overdueTasks.length > 0 && (
-              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+            {hasOverdueReminders && (
+              <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
             )}
           </button>
 
           {isNotifOpen && (
-            <div className="absolute right-0 mt-2 w-64 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 p-2">
+            <div className="absolute right-0 mt-2 w-96 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-50 p-2">
               <h3 className="text-sm font-semibold text-gray-900 dark:text-gray-100 px-3 py-2 border-b border-gray-100 dark:border-gray-800">
                 Reminders
               </h3>
               <div className="max-h-64 overflow-y-auto pt-2">
-                {overdueTasks.length === 0 ?
+                {allNotifications.length === 0 ?
                   <p className="text-sm text-gray-500 dark:text-gray-400 px-3 py-2 text-center">No new reminders</p>
                 : (
-                  overdueTasks.map(task => (
-                    <div key={task.id} className="px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors cursor-pointer">
-                      <p className="text-sm font-medium text-red-600 dark:text-red-400">Due: {task.name}</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">{task.deadline}</p>
+                  allNotifications.map(notif => {
+                    const subject = subjects.find(s => s.id === notif.subjectId);
+                    return (
+                    <div key={`${notif.type}-${notif.id}`} className="px-3 py-2 hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors flex items-center justify-between group">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <p className={`text-sm font-medium ${getReminderColor(notif.date)}`}>{notif.name}</p>
+                          {subject && (
+                            <span 
+                              className="text-[10px] px-1.5 py-0.5 rounded font-medium whitespace-nowrap"
+                              style={{ backgroundColor: `${subject.color}20`, color: subject.color }}
+                            >
+                              {subject.name}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">Due: {notif.date}</p>
+                      </div>
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openEditModal(notif.type, notif.id);
+                            setIsNotifOpen(false);
+                          }}
+                          className="p-1.5 bg-gray-100 dark:bg-gray-800 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900 transition-colors"
+                          title={`Edit ${notif.type}`}
+                        >
+                          <Edit2 className="w-4 h-4 text-blue-500 dark:text-blue-400" />
+                        </button>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (notif.type === 'reminder') {
+                              if (window.confirm("Are you sure you want to delete this reminder?")) {
+                                deleteReminder(notif.id);
+                              }
+                            }
+                          }}
+                          className="p-1.5 bg-gray-100 dark:bg-gray-800 rounded-md hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
+                          title={`Delete ${notif.type}`}
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500 dark:text-red-400" />
+                        </button>
+                      </div>
                     </div>
-                  ))
+                  );
+                })
                 )}
               </div>
             </div>
@@ -178,12 +273,16 @@ export default function TopNav() {
         </div>
 
         {/* Streak */}
-        <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg">
-          <Flame className={`w-5 h-5 ${studyStreak > 0 ? 'text-orange-500' : 'text-gray-400'}`} />
+        <button 
+          onClick={handleFlameClick}
+          className={`flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 rounded-lg transition-colors ${canClickFlame ? 'hover:bg-gray-200 dark:hover:bg-gray-700 cursor-pointer' : 'cursor-default opacity-80'}`}
+          title={canClickFlame ? "Click to claim today's streak!" : "Streak already claimed today"}
+        >
+          <Flame className={`w-5 h-5 ${displayStreak > 0 ? 'text-orange-500' : 'text-gray-400'} ${canClickFlame ? 'animate-pulse' : ''}`} />
           <span className="text-sm font-semibold text-gray-900 dark:text-gray-100">
-            {studyStreak}
+            {displayStreak}
           </span>
-        </div>
+        </button>
 
         {/* User Profile */}
         <button onClick={() => navigate('/profile')} className="flex items-center gap-3 pl-4 border-l border-gray-200 dark:border-gray-700 hover:opacity-80 transition-opacity text-left">

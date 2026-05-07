@@ -94,46 +94,51 @@ export default function FloatingActionButton({ onAction }: FloatingActionButtonP
   return (
     <div
       ref={fabRef}
-      className="fixed flex flex-col-reverse items-end gap-3 group z-50"
+      className="fixed z-50 group"
       style={{
         left: position.x !== null ? `${position.x}px` : 'auto',
         top: position.y !== null ? `${position.y}px` : 'auto',
         right: position.x === null ? '32px' : 'auto',
         bottom: position.y === null ? '32px' : 'auto',
-        cursor: isDragging ? 'grabbing' : 'grab',
       }}
-      onMouseDown={handleMouseDown}
     >
-      {/* Action Buttons - Show on hover */}
-      {!isDragging && (
-        <div className="flex flex-col-reverse gap-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 pointer-events-none group-hover:pointer-events-auto">
-          {actions.map((action) => (
-            <button
-              key={action.type}
-              onClick={(e) => {
-                e.stopPropagation();
-                onAction(action.type);
-              }}
-              className={`${action.color} action-btn text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center gap-3`}
-            >
-              <action.icon className="w-5 h-5" />
-              <span className="whitespace-nowrap">
-                {action.label}
-              </span>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* Main FAB */}
-      <div
-        className={`w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 ${!isDragging && 'group-hover:rotate-45'}`}
-      >
-        {isDragging ? (
-          <Move className="w-6 h-6 text-white" />
-        ) : (
-          <Plus className="w-6 h-6 text-white" />
+      <div className="relative flex flex-col items-end">
+        {/* Action Buttons - Show on hover */}
+        {!isDragging && (
+          <div className="absolute bottom-full right-0 mb-3 flex flex-col items-end gap-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
+            {/* Bridge element to maintain hover state across the gap */}
+            <div className="absolute -bottom-3 left-0 right-0 h-3" />
+            
+            {actions.map((action) => (
+              <button
+                key={action.type}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAction(action.type);
+                }}
+                className={`${action.color} action-btn text-white px-4 py-3 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center gap-3`}
+              >
+                <action.icon className="w-5 h-5" />
+                <span className="whitespace-nowrap">
+                  {action.label}
+                </span>
+              </button>
+            ))}
+          </div>
         )}
+
+        {/* Main FAB */}
+        <div
+          className={`w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-500 ${!isDragging && 'group-hover:rotate-45'}`}
+          style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+          onMouseDown={handleMouseDown}
+        >
+          {isDragging ? (
+            <Move className="w-6 h-6 text-white" />
+          ) : (
+            <Plus className="w-6 h-6 text-white" />
+          )}
+        </div>
       </div>
     </div>
   );

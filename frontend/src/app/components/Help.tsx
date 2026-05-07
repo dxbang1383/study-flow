@@ -36,7 +36,7 @@ export default function Help() {
         },
         {
           title: 'Weekly Schedule',
-          description: 'Plan your week by dragging subjects into time slots. Each cell represents a time period (Morning, Afternoon, Evening, Night). Hover over a scheduled subject and click "×" to remove it.',
+          description: 'Plan your week by dragging subjects into time slots. Each cell represents a time period (Shift 1, Shift 2, Shift 3, Shift 4). Hover over a scheduled subject and click "×" to remove it.',
         },
         {
           title: 'Overdue Tasks',

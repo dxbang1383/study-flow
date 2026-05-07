@@ -7,6 +7,8 @@ export interface User {
   nickname?: string;
   role?: string;
   avatar?: string;
+  streak?: number;
+  last_streak_date?: string;
 }
 
 interface AuthContextType {

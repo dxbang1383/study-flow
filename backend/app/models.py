@@ -11,3 +11,5 @@ class User(Base):
     nickname = Column(String, nullable=True)
     role = Column(String, nullable=True)
     avatar = Column(String, nullable=True)
+    streak = Column(Integer, default=0)
+    last_streak_date = Column(String, nullable=True)

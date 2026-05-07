@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 
 export default function Profile() {
-  const { user, token, updateUser } = useAuth();
+  const { user, token, updateUser, logout } = useAuth();
   const [nickname, setNickname] = useState(user?.nickname || '');
   const [email, setEmail] = useState(user?.email || '');
   const [role, setRole] = useState(user?.role || '');
@@ -55,9 +55,18 @@ export default function Profile() {
   return (
     <div className="h-full p-8 overflow-auto bg-gray-50 dark:bg-gray-950">
       <div className="max-w-2xl mx-auto space-y-8">
-        <div>
-          <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mb-2">User Profile</h1>
-          <p className="text-gray-600 dark:text-gray-400">Manage your account information and settings</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mb-2">User Profile</h1>
+            <p className="text-gray-600 dark:text-gray-400">Manage your account information and settings</p>
+          </div>
+          <Button 
+            variant="destructive" 
+            onClick={() => logout()}
+            className="bg-red-500 hover:bg-red-600 text-white"
+          >
+            Log out
+          </Button>
         </div>
 
         <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-800">

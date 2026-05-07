@@ -23,6 +23,11 @@ def register(user: schemas.UserCreate, db: Session = Depends(database.get_db)):
     db_user = db.query(models.User).filter(models.User.username == user.username).first()
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
+        
+    if user.email:
+        db_email = db.query(models.User).filter(models.User.email == user.email).first()
+        if db_email:
+            raise HTTPException(status_code=400, detail="Email already registered")
     hashed_password = auth.get_password_hash(user.password)
     new_user = models.User(
         username=user.username,
@@ -67,6 +72,10 @@ def update_user_info(user_update: schemas.UserUpdate, current_user: models.User 
         current_user.hashed_password = auth.get_password_hash(user_update.password)
     if user_update.avatar is not None:
         current_user.avatar = user_update.avatar
+    if user_update.streak is not None:
+        current_user.streak = user_update.streak
+    if user_update.last_streak_date is not None:
+        current_user.last_streak_date = user_update.last_streak_date
     db.commit()
     db.refresh(current_user)
     return current_user
