@@ -1,0 +1,585 @@
+\documentclass[12pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[vietnamese]{babel}
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{setspace}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{xltabular}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric, arrows.meta, positioning}
+\geometry{a4paper, margin=2.5cm}
+
+\begin{document}
+
+\thispagestyle{empty} 
+
+\begin{center}
+    \includegraphics[width=3cm]{logouet.png} 
+    
+    \vspace{1cm}
+    
+    {\LARGE \textbf{Software Requirements Specification -- SRS}}
+    
+    \vspace{2cm}
+    
+    {\large \textbf{STUDY MANAGEMENT WEB APP}}
+    
+\end{center}
+
+\newpage
+\begin{center}
+    \textbf{\large Table of Contents}
+\end{center}
+\vspace{0.5cm}
+
+\noindent Section 1. Overview\\[0.3cm]
+\hspace*{1cm}1.1 Purpose\\[0.3cm]
+\hspace*{1cm}1.2 Project Scope\\[0.3cm]
+\hspace*{1cm}1.3 Definitions\\[0.3cm]
+\hspace*{1cm}1.4 References\\[0.3cm]
+\hspace*{1cm}1.5 Overview\\[0.3cm]
+\noindent Section 2. Overall Description\\[0.3cm]
+\hspace*{1cm}2.1 Product Perspective\\[0.3cm]
+\hspace*{1cm}2.2 Product Functions\\[0.3cm]
+\hspace*{1cm}2.3 Users Of The System\\[0.3cm]
+\hspace*{1cm}2.4 Operating Environment\\[0.3cm]
+\hspace*{1cm}2.5 Constraints\\[0.3cm]
+\hspace*{1cm}2.6 Assumptions And Dependencies\\[0.3cm]
+\hspace*{1.5cm}2.6.1 Assumptions\\[0.3cm]
+\hspace*{1.5cm}2.6.2 Dependencies\\[0.3cm]
+\hspace*{1cm}2.7 User Needs\\[0.3cm]
+\noindent 3. Specific requirements\\[0.3cm]
+\hspace*{1cm}3.1 User Authentication\\[0.3cm]
+\hspace*{1cm}3.2 Manage Tasks\\[0.3cm]
+\hspace*{1cm}3.3 View Dashboard Progress\\[0.3cm]
+\hspace*{1cm}3.4 Manage Study Timer\\[0.3cm]
+\hspace*{1cm}3.5 Use Case Stories\\[0.3cm]
+\hspace*{1cm}3.6 Use Case Diagram\\[0.3cm]
+\hspace*{1cm}3.7 Activity Diagrams\\[0.3cm]
+\noindent 4. Non-Functional Requirements\\[0.3cm]
+\hspace*{1cm}4.1 Performance\\[0.3cm]
+\hspace*{1cm}4.2 Security\\[0.3cm]
+\hspace*{1cm}4.3 Usability\\[0.3cm]
+\hspace*{1cm}4.4 Reliability\\[0.3cm]
+\hspace*{1cm}4.5 Maintainability\\[0.3cm]
+\noindent 5. External Interface Requirements\\[0.3cm]
+\hspace*{1cm}5.1 User Interfaces\\[0.3cm]
+\hspace*{1cm}5.2 Software Interfaces\\[0.3cm]
+\hspace*{1cm}5.3 Hardware Interfaces\\[0.3cm]
+\hspace*{1cm}5.4 Communication Interfaces\\[0.3cm]
+\noindent 6. Use Case Summary\\[0.3cm]
+
+\newpage
+\section*{Section 1. Overview}
+
+\subsection*{1.1 Purpose}
+The purpose of this Software Requirements Specification (SRS) document is to provide a detailed overview of the Study-Flow web application. It describes the system's functional and non-functional requirements, its architecture, and its external interfaces. This document is intended for developers, project managers, and stakeholders to understand the complete scope of the Study-Flow system.
+
+\subsection*{1.2 Project Scope}
+Study-Flow is a comprehensive study management web application designed to help students and professionals organize their tasks and track their study time efficiently. The platform features an interactive Kanban board for task management, a Pomodoro-style timer for focused study sessions, and a real-time dashboard for overviewing progress. It is built using React for the frontend and FastAPI for the backend.
+
+\subsection*{1.3 Definitions}
+
+\begin{table}[htbp]
+    \centering
+    \label{tab:terms}
+    \begin{tabular}{>{\bfseries}l p{10cm}}
+        \toprule
+        Term & Meaning \\
+        \midrule
+        SPA & Single Page Application. \\
+        \addlinespace
+        Kanban & A visual method for managing tasks as they move through various stages (e.g., To Do, In Progress, Done). \\
+        \addlinespace
+        Pomodoro Technique & A time management method that uses a timer to break down work into intervals, traditionally 25 minutes in length, separated by short breaks. \\
+        \addlinespace
+        JWT & JSON Web Token, used for securely transmitting information between parties as a JSON object. \\
+        \bottomrule
+    \end{tabular}
+    
+\end{table}
+
+\subsection*{1.4 References}
+\begin{itemize}
+    \item React Documentation: \url{https://reactjs.org/}
+    \item FastAPI Documentation: \url{https://fastapi.tiangolo.com/}
+    \item IEEE 830-1998 Standard for Software Requirements Specifications.
+\end{itemize}
+
+\subsection*{1.5 Overview}
+The remainder of this document is organized as follows:
+\begin{itemize}
+   \item Section 2 provides an overall description of the software, its users, and its environment
+   \item Section 3 details the specific functional requirements, use case stories, use case diagrams, and activity diagrams.
+   \item Section 4
+ \end{itemize}
+ 
+\section*{Section 2: Overall Description}
+\subsection*{2.1 Product Perspective}
+Study-Flow is a standalone, full-stack web application. The frontend is an SPA communicating via RESTful HTTP requests to the FastAPI backend. Data persistence is handled by an SQLite database through SQLAlchemy ORM.
+
+\subsection*{2.2 Product Function}
+The main functions of the system are:
+
+\vspace{0.3cm}
+\noindent
+\renewcommand{\arraystretch}{1.5}
+\begin{xltabular}{\textwidth}{|l|X|}
+\hline
+\textbf{Function} & \textbf{Description} \\ \hline
+User Authentication & The user registers, logs in securely, and updates profile information using JWT. \\ \hline
+Manage Tasks & The user creates, edits, deletes, and tracks tasks across different statuses using a Kanban board. \\ \hline
+View Dashboard Progress & The user views overall study statistics, completed tasks, and current streaks on a dashboard. \\ \hline
+Manage Study Timer & The user starts, pauses, and completes Pomodoro timer sessions to track focused study time. \\ \hline
+Persist Local State & The system stores tasks, timer progress, and user data locally and synchronizes with the backend database so that information can be restored after the application restarts. \\ \hline
+\end{xltabular}
+\vspace{0.3cm}
+
+\subsection*{2.3 Users Of The System}
+Study-Flow implements user accounts and secure authentication. All authenticated users can access the main functions (Task Management, Pomodoro Timer, Dashboard Progress) to organize their study workflows.
+
+\vspace{0.3cm}
+\noindent
+\renewcommand{\arraystretch}{1.5}
+\begin{xltabular}{\textwidth}{|l|X|}
+\hline
+\textbf{Attribute} & \textbf{Detail} \\ \hline
+Technical level & Basic to intermediate, able to use web applications and navigate intuitive interfaces \\ \hline
+Main actions & Register/login, create and manage tasks on a Kanban board, control the Pomodoro timer, and view progress on the dashboard \\ \hline
+Access level & Full access to their own tasks and study data (no administrative privileges required) \\ \hline
+Environment knowledge & Knows how to use a standard web browser on desktop or mobile devices \\ \hline
+\end{xltabular}
+\vspace{0.3cm}
+
+\subsection*{2.4 Operating Environment}
+\begin{itemize}
+    \item Operating system: Windows, macOS, Linux, iOS, or Android
+    \item Delivery format: web application accessible via standard browsers
+    \item Network: internet connection is required for API communication
+    \item User interface: responsive web user interface
+    \item Input devices: keyboard, mouse, or touch screen
+    \item Storage: local storage for JWT tokens and SQLite database on the server
+\end{itemize}
+
+\subsection*{2.5 Constraints}
+\begin{itemize}
+    \item The application must be accessible on modern web browsers.
+    \item The frontend state management must be handled by Zustand.
+    \item The drag-and-drop functionality must be implemented using react-dnd.
+    \item The backend must process requests concurrently using FastAPI's async capabilities.
+    \item User passwords must be securely hashed using bcrypt before storage.
+    \item The database schema must be managed using SQLAlchemy ORM.
+\end{itemize}
+
+\subsection*{2.6 Assumptions And Dependencies}
+\subsubsection*{2.6.1 Assumptions}
+\begin{itemize}
+    \item The end-user has a stable internet connection.
+    \item The user's device clock is accurate for timer functionalities.
+\end{itemize}
+\subsubsection*{2.6.2 Dependencies}
+\begin{itemize}
+    \item The drag-and-drop UI depends on the \texttt{react-dnd} library.
+    \item Frontend state management relies on \texttt{zustand}.
+\end{itemize}
+
+\subsection*{2.7 User Needs}
+
+\vspace{0.3cm}
+\noindent
+\renewcommand{\arraystretch}{1.5}
+\begin{xltabular}{\textwidth}{|p{4.5cm}|X|X|}
+\hline
+\textbf{User Need} & \textbf{Why it matters} & \textbf{How the system handles it} \\ \hline
+Organize tasks visually & Users need to quickly see what tasks are pending, in progress, or completed to manage their workload effectively & The system provides an interactive Kanban board with drag-and-drop capabilities across different status columns \\ \hline
+Maintain focus during study sessions & Users often struggle with distractions and need a structured way to concentrate & The system integrates a Pomodoro timer to enforce structured study and break intervals \\ \hline
+Track learning progress over time & Users need motivation and insights into how much time they have spent studying & The Dashboard displays aggregate statistics, completed tasks, and study streaks \\ \hline
+Securely access personal data from anywhere & Users want their study data to be private, safe, and accessible across different devices & The app requires secure JWT authentication and persists all data safely to a backend database \\ \hline
+Avoid losing temporary state & Users should not lose their timer progress or task updates if they accidentally refresh the page & The frontend utilizes Zustand and local storage to sync and persist application state \\ \hline
+\end{xltabular}
+\vspace{0.3cm}
+
+\section*{3. Specific Functional Requirements}
+
+\subsection*{3.1 User Authentication}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{xltabular}{\textwidth}{|p{4cm}|X|}
+\hline
+\textbf{Use Case Name} & \textbf{User Authentication} \\ \hline
+\textbf{XRef} & Section 2.2 — Product Functions; Section 2.5 — Constraints \\ \hline
+\textbf{Actor} & User \\ \hline
+\textbf{Trigger} & The user opens the login/register page to access the system. \\ \hline
+\textbf{Precondition} & None (for register); User account exists (for login). \\ \hline
+\textbf{Basic Path} & 1. The user navigates to the login/register page. \newline 2. The user enters their username and password. \newline 3. The user clicks submit. \newline 4. The system validates the input. \newline 5. The system creates the account or verifies credentials. \newline 6. The system generates a JWT token and stores it locally. \newline 7. The system redirects the user to the Dashboard. \\ \hline
+\textbf{Alternative Paths} & If the username already exists during registration, the system shows an error message. If the password is incorrect during login, the system shows an "Invalid credentials" error. \\ \hline
+\textbf{Postcondition} & The user is authenticated and redirected to the main application. \\ \hline
+\textbf{Exception Paths} & The backend server is unreachable; the system displays a network error. \\ \hline
+\textbf{Other} & Passwords must be hashed using bcrypt before being stored. \\ \hline
+\end{xltabular}
+
+\subsection*{3.2 Manage Tasks}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{xltabular}{\textwidth}{|p{4cm}|X|}
+\hline
+\textbf{Use Case Name} & \textbf{Manage Tasks} \\ \hline
+\textbf{XRef} & Section 2.2 — Product Functions \\ \hline
+\textbf{Actor} & User \\ \hline
+\textbf{Trigger} & The user opens the Tasks (Kanban) tab to organize their work. \\ \hline
+\textbf{Precondition} & The user must be authenticated and logged in. \\ \hline
+\textbf{Basic Path} & 1. The user navigates to the Tasks board. \newline 2. The system loads existing tasks from the database. \newline 3. The user clicks "Add Task" or drags an existing task to a new column. \newline 4. The system updates the task status locally in Zustand. \newline 5. The system sends an API request to persist the new task state to the database. \\ \hline
+\textbf{Alternative Paths} & If the API update fails, the system reverts the local UI state to its previous condition and shows a warning. \\ \hline
+\textbf{Postcondition} & The task is successfully created, updated, or moved, and the changes are saved to the backend. \\ \hline
+\textbf{Exception Paths} & The user loses internet connection; drag-and-drop actions are disabled or cached locally until reconnected. \\ \hline
+\textbf{Other} & The drag-and-drop interaction should be smooth and not block the UI during API calls. \\ \hline
+\end{xltabular}
+
+\subsection*{3.3 View Dashboard Progress}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{xltabular}{\textwidth}{|p{4cm}|X|}
+\hline
+\textbf{Use Case Name} & \textbf{View Dashboard Progress} \\ \hline
+\textbf{XRef} & Section 2.2 — Product Functions \\ \hline
+\textbf{Actor} & User \\ \hline
+\textbf{Trigger} & The user navigates to the Dashboard tab. \\ \hline
+\textbf{Precondition} & The user must be authenticated. \\ \hline
+\textbf{Basic Path} & 1. The user selects the Dashboard view. \newline 2. The system fetches the user's study metrics, task completion data, and active streaks from the API. \newline 3. The system renders charts and summary statistics. \\ \hline
+\textbf{Alternative Paths} & If the user has no previous data, the system displays empty states encouraging the user to start a timer or create a task. \\ \hline
+\textbf{Postcondition} & The user sees an accurate reflection of their study progress. \\ \hline
+\textbf{Exception Paths} & API timeout occurs while fetching statistics; the system displays an error message and a retry button. \\ \hline
+\textbf{Other} & Dashboard rendering must be fast and data should be cached locally to minimize loading times. \\ \hline
+\end{xltabular}
+
+\subsection*{3.4 Manage Study Timer}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{xltabular}{\textwidth}{|p{4cm}|X|}
+\hline
+\textbf{Use Case Name} & \textbf{Manage Study Timer} \\ \hline
+\textbf{XRef} & Section 2.2 — Product Functions \\ \hline
+\textbf{Actor} & User \\ \hline
+\textbf{Trigger} & The user opens the Timer tab to start a Pomodoro session. \\ \hline
+\textbf{Precondition} & The user must be authenticated. \\ \hline
+\textbf{Basic Path} & 1. The user navigates to the Timer page. \newline 2. The user selects a session duration. \newline 3. The user clicks "Start Timer". \newline 4. The system begins the countdown. \newline 5. When the timer reaches zero, the system plays an alert sound. \newline 6. The system logs the completed session to the database. \\ \hline
+\textbf{Alternative Paths} & The user clicks "Pause" during the session; the timer stops counting down until resumed. The user clicks "Reset"; the timer resets without logging the session. \\ \hline
+\textbf{Postcondition} & A study session is completed and recorded in the database. \\ \hline
+\textbf{Exception Paths} & The user closes the tab mid-session; the system optionally warns the user or attempts to save partial progress locally. \\ \hline
+\textbf{Other} & The timer must rely on robust timestamp calculations to remain accurate if the browser throttles background tabs. \\ \hline
+\end{xltabular}
+
+\subsection*{3.5 Use case stories}
+\noindent\textbf{UC-01: User Authentication} \\
+\textit{As a user, I want to register and log in to the application so that my personal study data and tasks are securely saved and accessible only to me.} \\
+\textbf{Acceptance Criteria:} The user can successfully create an account. Passwords are encrypted. Invalid login attempts return an appropriate error message.
+
+\vspace{0.3cm}
+\noindent\textbf{UC-02: Manage Tasks} \\
+\textit{As a user, I want to create tasks and drag them across different progress columns so that I can visually track what I need to do and what I have finished.} \\
+\textbf{Acceptance Criteria:} Tasks can be created and deleted. Tasks dragged to a new column instantly update their status on the frontend and persist to the backend.
+
+\vspace{0.3cm}
+\noindent\textbf{UC-03: View Dashboard Progress} \\
+\textit{As a user, I want to view a summary of my study statistics on a dashboard so that I can evaluate my productivity over time.} \\
+\textbf{Acceptance Criteria:} The dashboard accurately reflects the data from the database, updating whenever a new task is completed or a timer session finishes.
+
+\vspace{0.3cm}
+\noindent\textbf{UC-04: Manage Study Timer} \\
+\textit{As a user, I want to use a Pomodoro timer to manage my study sessions and breaks so that I can maintain focus and prevent burnout.} \\
+\textbf{Acceptance Criteria:} The timer counts down accurately. It provides a visual/audio cue upon completion and logs the session.
+
+\subsection*{3.6 Use Case Diagram}
+Below is the detailed Use Case Diagram for the Study-Flow system, illustrating actors, system boundaries, and advanced relationships (\texttt{<<include>>}, \texttt{<<extend>>}, and generalization).
+
+\begin{center}
+\resizebox{\textwidth}{!}{
+\begin{tikzpicture}[
+    usecase/.style={ellipse, draw=black, thick, minimum width=2.8cm, minimum height=1.2cm, align=center, fill=white},
+    actor/.style={align=center},
+    include/.style={dashed, -{Stealth[length=3mm]}, font=\small},
+    extend/.style={dashed, -{Stealth[length=3mm]}, font=\small},
+    inherit/.style={solid, -{Triangle[open, length=4mm, width=4mm]}, thick},
+    assoc/.style={solid, thick}
+  ]
+
+  \tikzset{
+      stickman/.pic={
+          \draw[thick] (0,0.4) circle (0.25);
+          \draw[thick] (0,0.15) -- (0,-0.8); 
+          \draw[thick] (-0.5,-0.2) -- (0.5,-0.2); 
+          \draw[thick] (0,-0.8) -- (-0.4,-1.6);
+          \draw[thick] (0,-0.8) -- (0.4,-1.6); 
+      }
+  }
+
+  \draw[thick] (0, -11) rectangle (14, 5);
+  \node at (7, 4.3) {\Large \textbf{Study-Flow System}};
+
+  \pic (student) at (-2, -3) {stickman};
+  \node at (-2, -5) {\textbf{Student}};
+
+  \pic (user) at (16, 2) {stickman};
+  \node at (16, 0) {\textbf{System User}};
+
+  \pic (admin) at (15, -4) {stickman};
+  \node at (15, -6) {\textbf{Admin}};
+  
+  \pic (authuser) at (17, -4) {stickman};
+  \node at (17, -6) {\textbf{Auth User}};
+
+  \draw[inherit] (15, -3.5) -- (15.8, 1.5); 
+  \draw[inherit] (17, -3.5) -- (16.2, 1.5); 
+
+  \node[usecase] (login) at (6.5, 3) {Login};
+  \node[usecase] (social) at (2, 3) {Social Login}; 
+  
+  \node[usecase] (profile) at (11.5, 3) {Manage Profile}; 
+  \node[usecase] (avatar) at (11.5, 0.5) {Upload Avatar}; 
+  
+  \node[usecase] (tasks) at (3, -1.5) {Manage Tasks}; 
+  \node[usecase] (sync) at (8, -3) {Sync to Database}; 
+  \node[usecase] (timer) at (3, -5) {Use Pomodoro}; 
+  
+  \node[usecase] (dash) at (10, -5) {View Dashboard}; 
+  \node[usecase] (export) at (6, -7) {Export Statistics}; 
+  \node[usecase] (adminDash) at (11, -1.5) {Admin Dashboard}; 
+
+  \draw[assoc] (-1, -3) -- (social.west);
+  \draw[assoc] (-1, -3) -- (login.west);
+  \draw[assoc] (-1, -3) -- (tasks.west);
+  \draw[assoc] (-1, -3) -- (timer.west);
+  \draw[assoc] (-1, -3) -- (dash.west);
+
+  \draw[assoc] (15, 2) -- (profile.east);
+  \draw[assoc] (15, 2) -- (adminDash.east);
+  \draw[assoc] (14, -4) -- (dash.east);
+  \draw[assoc] (16, -4) -- (export.east);
+
+  \draw[inherit] (social) -- (login); 
+  \draw[extend] (login) -- node[above] {extend} (profile); 
+  \draw[inherit] (avatar) -- (profile); 
+  
+  \draw[include] (tasks) -- node[above, sloped] {include} (sync); 
+  \draw[include] (timer) -- node[below, sloped] {include} (sync); 
+  
+  \draw[extend] (export) -- node[below, sloped] {extend} (dash); 
+  \draw[inherit] (adminDash) -- (dash); 
+
+\end{tikzpicture}
+}
+\end{center}
+
+\subsection*{3.7 Activity Diagram}
+
+\subsubsection*{3.7.1 Task Management Flow} 
+This diagram shows the flow from opening the Kanban board to creating or moving tasks and updating the database.
+
+\begin{center}
+\begin{tikzpicture}[node distance=2.5cm, every node/.style={font=\sffamily\small}, align=center]
+  \tikzstyle{startnode} = [circle, fill=black, minimum size=0.5cm]
+  \tikzstyle{endnode} = [circle, draw=black, thick, minimum size=0.6cm]
+  \tikzstyle{endcenter} = [circle, fill=black, minimum size=0.3cm]
+  \tikzstyle{process} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black!70, fill=blue!10, thick]
+  \tikzstyle{decision} = [diamond, aspect=2, minimum width=2.5cm, minimum height=1cm, text centered, draw=black!70, fill=orange!20, thick]
+  \tikzstyle{arrow} = [thick,->,>=stealth]
+  \tikzstyle{guard} = [anchor=center, fill=white, inner sep=2pt, font=\scriptsize]
+
+  \node (start) [startnode] {};
+  \node (board) [process, right of=start, xshift=1.5cm] {Open Kanban Board};
+  \node (decide) [decision, below of=board] {Action?};
+  
+  \node (create) [process, left of=decide, xshift=-2cm] {Create New Task};
+  \node (move) [process, right of=decide, xshift=2cm] {Drag \& Drop Task};
+  
+  \node (update) [process, below of=decide, yshift=-1cm] {Update DB via API};
+  
+  \node (stop) [endnode, right of=update, xshift=1.5cm] {};
+  \node [endcenter] at (stop) {};
+
+  \node (note) [rectangle, fill=yellow!20, draw=black!50, text width=3cm, anchor=south west] at (board.north east) {Tasks belong to authenticated user only.};
+  \draw[dashed] (note.south west) -- (board.north east);
+
+  \draw [arrow] (start) -- (board);
+  \draw [arrow] (board) -- (decide);
+  
+  \draw [arrow] (decide) -- node[pos = 0.5, above, yshift = 10pt, guard]{[want to move]} (move);
+  \draw [arrow] (decide) -- node[pos = 0.5, above, yshift = 10pt, guard]{[want to create]} (create);
+  
+  \draw [arrow] (create) |- (update);
+  \draw [arrow] (move) |- (update);
+  
+  \draw [arrow] (update) -- (stop);
+\end{tikzpicture}
+\end{center}
+
+\vspace{1cm}
+\subsubsection*{3.7.2 Timer Flow}
+This diagram shows how the user starts the Pomodoro timer, how pause controls work, and how the session is logged to the database.
+
+\begin{center}
+\begin{tikzpicture}[node distance=3cm, every node/.style={font=\sffamily\small}, align=center]
+  \tikzstyle{startnode} = [circle, fill=black, minimum size=0.5cm]
+  \tikzstyle{endnode} = [circle, draw=black, thick, minimum size=0.6cm]
+  \tikzstyle{endcenter} = [circle, fill=black, minimum size=0.3cm]
+  \tikzstyle{process} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black!70, fill=blue!10, thick]
+  \tikzstyle{decision} = [diamond, aspect=2, minimum width=2.5cm, minimum height=1cm, text centered, draw=black!70, fill=orange!20, thick]
+  \tikzstyle{arrow} = [thick,->,>=stealth]
+  \tikzstyle{guard} = [anchor=center, fill=white, inner sep=2pt, font=\scriptsize]
+
+  \node (start) [startnode] {};
+  \node (timer) [process, below of=start, yshift=1cm] {Start Timer};
+  \node (countdown) [process, below of=timer] {Countdown Active};
+  \node (decide) [decision, below of=countdown] {Time Up?};
+  
+  \node (pause) [process, right of=countdown, xshift=2.5cm] {Pause Timer};
+  
+  \node (log) [process, below of=decide, yshift=-0.5cm] {Log Session to DB};
+  \node (stop) [endnode, below of=log, yshift=1cm] {};
+  \node [endcenter] at (stop) {};
+
+  \draw [arrow] (start) -- (timer);
+  \draw [arrow] (timer) -- (countdown);
+  \draw [arrow] (countdown) -- (decide);
+  
+  \draw [arrow] (decide.east) -| node[guard, near start] {[user pauses]} (pause.south);
+  \draw [arrow] (pause) -- (countdown.east);
+  
+  \draw [arrow] (decide.south) -- node[guard] {[time expires]} (log.north);
+  \draw [arrow] (log) -- (stop);
+\end{tikzpicture}
+\end{center}
+
+\vspace{1cm}
+\subsubsection*{3.7.3 Dashboard Progress Flow}
+This diagram shows how the system fetches user data and statistics via the API and renders charts on the dashboard.
+
+\begin{center}
+\begin{tikzpicture}[node distance=2.5cm, every node/.style={font=\sffamily\small}, align=center]
+  \tikzstyle{startnode} = [circle, fill=black, minimum size=0.5cm]
+  \tikzstyle{endnode} = [circle, draw=black, thick, minimum size=0.6cm]
+  \tikzstyle{endcenter} = [circle, fill=black, minimum size=0.3cm]
+  \tikzstyle{process} = [rectangle, rounded corners, minimum width=3cm, minimum height=1cm, text centered, draw=black!70, fill=blue!10, thick]
+  \tikzstyle{decision} = [diamond, aspect=2, minimum width=2.5cm, minimum height=1cm, text centered, draw=black!70, fill=orange!20, thick]
+  \tikzstyle{arrow} = [thick,->,>=stealth]
+  \tikzstyle{guard} = [anchor=center, fill=white, inner sep=2pt, font=\scriptsize]
+
+  \node (start) [startnode] {};
+  \node (fetch) [process, below of=start, yshift=1cm] {Fetch User Data via API};
+  \node (decide) [decision, below of=fetch] {Data exists?};
+  
+  \node (empty) [process, right of=decide, xshift=2.5cm] {Show Empty State};
+  \node (render) [process, below of=decide, yshift=-0.5cm] {Render Charts \& Metrics};
+  
+  \node (stop) [endnode, below of=render, yshift=1cm] {};
+  \node [endcenter] at (stop) {};
+
+  \draw [arrow] (start) -- (fetch);
+  \draw [arrow] (fetch) -- (decide);
+  
+  \draw [arrow] (decide.east) -- node[guard] {[no data]} (empty.west);
+  \draw [arrow] (empty.south) |- (stop.east);
+  
+  \draw [arrow] (decide.south) -- node[guard] {[data found]} (render.north);
+  \draw [arrow] (render) -- (stop);
+\end{tikzpicture}
+\end{center}
+
+\section*{4. Non-Functional Requirements}
+
+\subsection*{4.1 Performance}
+\begin{itemize}
+    \item The Kanban Board and Timer screens should respond to valid input changes (e.g., drag-and-drop actions) within 1 second on a standard laptop/desktop.
+    \item The application should render the Dashboard charts and load user statistics within 2 seconds after successful login, assuming a standard network connection.
+    \item Under default settings, the FastAPI backend should support at least 100 concurrent task synchronization requests smoothly.
+    \item The system should complete API validation and storage of standard CRUD operations (creating tasks, logging sessions) within a reasonable time (under 500ms) for interactive use.
+    \item The application should remain highly responsive while API requests (like task updates) are being processed in the background.
+    \item The system must provide a robust timeout mechanism for API calls (configurable; default 10s) to avoid blocking the user interface if the server is unreachable.
+    \item Client-side state updates (via Zustand) must be idempotent and avoid redundant network requests when local data is already perfectly synced with the server.
+\end{itemize}
+
+\vspace{0.5cm}
+\subsection*{4.2 Security}
+\begin{itemize}
+    \item User passwords must be securely hashed using bcrypt (version 3.2.2 or higher) before being stored in the database.
+    \item The system must use JSON Web Tokens (JWT) for authenticating API requests. Tokens must expire after a configurable timeframe (default 24 hours) and be stored securely on the client side.
+    \item The backend API must implement robust input validation (via Pydantic) to protect against common SQL and NoSQL injection attacks.
+    \item The application must protect against Cross-Site Scripting (XSS) by properly escaping user-generated content before rendering it on the frontend.
+\end{itemize}
+
+\vspace{0.5cm}
+\subsection*{4.3 Reliability \& Availability}
+\begin{itemize}
+    \item The system should aim to maintain a high availability rate of 99.9\% during normal operating hours.
+    \item In the event of a network failure, the frontend application must gracefully handle offline states, preventing data loss by caching actions (like drag-and-drop or timer completions) locally until the connection is restored.
+    \item The backend API must include comprehensive error handling and logging to prevent server crashes and facilitate rapid debugging.
+    \item Automated daily backups of the SQLite database should be supported to prevent catastrophic data loss.
+\end{itemize}
+
+\vspace{0.5cm}
+\subsection*{4.4 Maintainability}
+\begin{itemize}
+    \item The frontend codebase must be strictly typed using TypeScript, and the backend using Python type hints, to ensure code readability and reduce runtime errors.
+    \item The React application must follow a modular, component-based architecture, ensuring that UI elements (Kanban, Timer, Dashboard) are decoupled and easily testable.
+    \item The backend API endpoints must be fully documented using auto-generated Swagger/OpenAPI documentation natively provided by FastAPI.
+    \item Code must adhere to standard linting and formatting rules (e.g., ESLint/Prettier for React, PEP8/Black for Python).
+\end{itemize}
+
+\vspace{0.5cm}
+\subsection*{4.5 Portability \& Compatibility}
+\begin{itemize}
+    \item The web application must be fully responsive and function correctly across major modern web browsers (Google Chrome, Mozilla Firefox, Safari, and Microsoft Edge).
+    \item The frontend UI (built with Tailwind CSS) must support seamless switching between Light and Dark modes based on user preference or system settings.
+    \item The application must be easily deployable on standard cloud infrastructure (AWS, Heroku, Vercel, etc.) using Docker containers if necessary, without requiring vendor-specific modifications.
+    \item The backend API must be OS-agnostic, capable of running smoothly on Windows, Linux, or macOS environments.
+\end{itemize}
+
+\section*{5. External Interface Requirements}
+
+\subsection*{5.1 User Interfaces}
+\begin{itemize}
+    \item The user interface must be a web-based application built with React, ensuring a responsive design that adapts to desktop, tablet, and mobile screens.
+    \item The application must feature intuitive drag-and-drop mechanics for task management on the Kanban board.
+    \item The Timer page must offer a clean, distraction-free visual aesthetic to maximize user focus during Pomodoro sessions.
+    \item The Dashboard must present data using clear visual hierarchies and easy-to-read charts for productivity tracking.
+    \item The UI must support standard accessibility guidelines and provide seamless switching between Light and Dark themes via Tailwind CSS.
+\end{itemize}
+
+\subsection*{5.2 Software Interfaces}
+\begin{itemize}
+    \item \textbf{Backend Framework:} The system interfaces with FastAPI (Python) to expose RESTful API endpoints, fully documented via an auto-generated OpenAPI/Swagger UI.
+    \item \textbf{Database System:} The application interfaces with a SQLite database for local data storage, abstracted through the SQLAlchemy ORM to allow seamless future migration to PostgreSQL or MySQL.
+    \item \textbf{Data Contract:} All data exchanged between the React frontend and the FastAPI backend must be formatted as JSON, with strict validation enforced by Pydantic models.
+\end{itemize}
+
+\subsection*{5.3 Hardware Interfaces}
+\begin{itemize}
+    \item The application does not require any specialized hardware interfaces. It is designed to run on standard consumer devices, including personal computers, laptops, tablets, and smartphones.
+    \item Interaction with the system requires standard hardware input devices such as a keyboard, mouse, trackpad, or touchscreen display.
+\end{itemize}
+
+\subsection*{5.4 Communication Interfaces}
+\begin{itemize}
+    \item \textbf{Network Protocols:} All client-server communications must utilize standard HTTP/1.1 or HTTP/2 protocols.
+    \item \textbf{Security:} In production environments, all communication must be encrypted using HTTPS/TLS to protect sensitive user data (e.g., passwords, JWT tokens) during transit.
+    \item \textbf{Data Format:} The system relies exclusively on REST APIs transmitting JSON payloads for data exchange.
+    \item \textbf{Connectivity:} An active Internet connection is required for data synchronization, though the frontend local state (Zustand) can temporarily cache actions during brief network interruptions.
+\end{itemize}
+
+\section*{6. Use Case Summary}
+
+\renewcommand{\arraystretch}{1.5}
+\begin{xltabular}{\textwidth}{|l|l|X|}
+\hline
+\textbf{Use Case Name} & \textbf{Actor} & \textbf{Short Description} \\ \hline
+User Authentication & User & The user registers or logs in to access the system and secure personal data. \\ \hline
+Manage Tasks & User & The user creates, updates, and tracks task progress by dragging and dropping them on an interactive Kanban board. \\ \hline
+View Dashboard Progress & User & The user views a visual summary of their study statistics, completed tasks, and productivity trends over time. \\ \hline
+Manage Study Timer & User & The user runs a Pomodoro timer to manage focus sessions and automatically logs completed study time to the database. \\ \hline
+\end{xltabular}
+
+\end{document}
